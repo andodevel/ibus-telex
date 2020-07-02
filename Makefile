@@ -18,7 +18,7 @@
 engine_name=telex
 ibus_e_name=ibus-engine-$(engine_name)
 pkg_name=ibus-$(engine_name)
-version=0.6.4
+version=0.0.1
 
 engine_dir=/usr/share/$(pkg_name)
 ibus_dir=/usr/share/ibus
@@ -72,7 +72,7 @@ rpm: clean
 	rpmbuild $(pkg_name).spec -ba
 
 deb: clean
-	dpkg-buildpackage
+	dpkg-buildpackage -uc -us
 
 
 .PHONY: build clean build install uninstall src rpm deb
