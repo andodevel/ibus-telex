@@ -26,8 +26,8 @@ import (
 	"reflect"
 	"sync"
 
-	"github.com/andodevel/telex-core"
 	"github.com/andodevel/goibus/ibus"
+	"github.com/andodevel/telex-core"
 	"github.com/godbus/dbus"
 )
 
