@@ -34,7 +34,7 @@
               <language>vi</language>
               <license>GPLv3</license>
               <author>Luong Thanh Lam &lt;ltlam93@gmail.com&gt;</author>
-              <icon>/usr/share/ibus-telex/viet-on.png</icon>
+              <icon>/usr/share/ibus-telex/ibus-telex.png</icon>
               <layout>default</layout>
               <longname>Telex</longname>
               <description>Vietnamese input method editor</description>
