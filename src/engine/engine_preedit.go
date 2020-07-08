@@ -23,7 +23,7 @@ import (
 	"log"
 	"strings"
 
-	"github.com/sarim/goibus/ibus"
+	"github.com/BambooEngine/goibus/ibus"
 	"github.com/andodevel/ibus-telex/src/core"
 	"github.com/godbus/dbus"
 )

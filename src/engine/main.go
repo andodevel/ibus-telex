@@ -25,7 +25,7 @@ import (
 	"log"
 	"os"
 
-	"github.com/sarim/goibus/ibus"
+	"github.com/BambooEngine/goibus/ibus"
 )
 
 const (

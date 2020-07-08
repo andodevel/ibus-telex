@@ -34,7 +34,7 @@ dev-tools:
 # Initialize project. All init(s) target should be run only once to create the project.
 .PHONY: init
 init: dev-tools
-	go get -u github.com/sarim/goibus/ibus
+	go get -u github.com/BambooEngine/goibus/ibus
 	go get -u github.com/godbus/dbus
 	@echo "Install pre-commit hooks"
 	@chmod +x ./hack/check.sh

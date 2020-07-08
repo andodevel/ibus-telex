@@ -20,7 +20,7 @@
 package main
 
 import (
-	"github.com/sarim/goibus/ibus"
+	"github.com/BambooEngine/goibus/ibus"
 )
 
 const (

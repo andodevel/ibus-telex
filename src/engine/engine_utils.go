@@ -26,7 +26,7 @@ import (
 	"time"
 
 	"github.com/andodevel/ibus-telex/src/core"
-	"github.com/sarim/goibus/ibus"
+	"github.com/BambooEngine/goibus/ibus"
 	"github.com/godbus/dbus"
 )
 
