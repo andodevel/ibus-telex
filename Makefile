@@ -15,6 +15,32 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
+
+SHELL := /bin/bash
+
+# FIXME: Variable not work at all
+VERSION := $(SHELL cat ./VERSION).
+LDFLAGS += -X "main.BuildTimestamp=$(SHELL date -u "+%Y-%m-%d %H:%M:%S")"
+LDFLAGS += -X "main.Version=$(VERSION)$(SHELL git rev-parse --short HEAD)"
+
+GO := GO111MODULE=on go
+
+# Developement
+.PHONY: dev-tools
+dev-tools:
+	go get -u golang.org/x/lint/golint
+	go get -u golang.org/x/tools/cmd/goimports
+
+# Initialize project. All init(s) target should be run only once to create the project.
+.PHONY: init
+init: dev-tools
+	go get -u github.com/sarim/goibus/ibus
+	go get -u github.com/godbus/dbus
+	@echo "Install pre-commit hooks"
+	@chmod +x ./hack/check.sh
+	@chmod +x ./hooks/pre-commit
+	@ln -sf ./hooks/pre-commit ./.git/hooks/pre-commit || true
+
 engine_name=telex
 ibus_e_name=ibus-engine-$(engine_name)
 pkg_name=ibus-$(engine_name)
@@ -23,15 +49,13 @@ version=0.0.1
 engine_dir=/usr/share/$(pkg_name)
 ibus_dir=/usr/share/ibus
 
-GOPATH=$(shell pwd)/vendor:$(shell pwd)
-
 rpm_src_dir=~/rpmbuild/SOURCES
 tar_file=$(pkg_name)-$(version).tar.gz
 rpm_src_tar=$(rpm_src_dir)/$(tar_file)
 tar_options_src=--transform "s/^\./$(pkg_name)-$(version)/" --exclude={"*.tar.gz",".git",".idea"} .
 
 build:
-	GOPATH=$(CURDIR) go build -ldflags="-s -w" -o $(ibus_e_name) ibus-$(engine_name)
+	@$(GO) build -ldflags="-s -w" -o $(ibus_e_name) ./src/engine
 
 clean:
 	rm -f ibus-engine-* *_linux *_cover.html go_test_* go_build_* test *.gz test
