@@ -1,6 +1,6 @@
 # IBUS-TELEX
 
-Simplified version of https://github.com/andodevel/ibus-telex that support only preedit Telex
+Simplified version of [ibus-bamboo](https://github.com/BambooEngine/ibus-bamboo) that support only preedit Telex
 
 ![preview](./docs/preview.png)
 
