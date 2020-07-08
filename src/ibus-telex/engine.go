@@ -31,7 +31,7 @@ import (
 	"github.com/godbus/dbus"
 )
 
-type IBusandodevel struct {
+type IBusTelex struct {
 	sync.Mutex
 	ibus.Engine
 	preeditor              telex.IEngine
@@ -64,7 +64,7 @@ Return:
 
 This function gets called whenever a key is pressed.
 */
-func (e *IBusandodevel) ProcessKeyEvent(keyVal uint32, keyCode uint32, state uint32) (bool, *dbus.Error) {
+func (e *IBusTelex) ProcessKeyEvent(keyVal uint32, keyCode uint32, state uint32) (bool, *dbus.Error) {
 	if e.isIgnoredKey(keyVal, state) {
 		return false, nil
 	}
@@ -78,7 +78,7 @@ func (e *IBusandodevel) ProcessKeyEvent(keyVal uint32, keyCode uint32, state uin
 	return e.preeditProcessKeyEvent(keyVal, keyCode, state)
 }
 
-func (e *IBusandodevel) FocusIn() *dbus.Error {
+func (e *IBusTelex) FocusIn() *dbus.Error {
 	log.Print("FocusIn.")
 	var oldWmClasses = e.wmClasses
 	e.wmClasses = x11GetFocusWindowClass()
@@ -93,13 +93,13 @@ func (e *IBusandodevel) FocusIn() *dbus.Error {
 	return nil
 }
 
-func (e *IBusandodevel) FocusOut() *dbus.Error {
+func (e *IBusTelex) FocusOut() *dbus.Error {
 	log.Print("FocusOut.")
 	//e.wmClasses = ""
 	return nil
 }
 
-func (e *IBusandodevel) Reset() *dbus.Error {
+func (e *IBusTelex) Reset() *dbus.Error {
 	fmt.Print("Reset.\n")
 	if e.checkInputMode(preeditIM) {
 		e.commitPreedit(e.getPreeditString())
@@ -107,19 +107,19 @@ func (e *IBusandodevel) Reset() *dbus.Error {
 	return nil
 }
 
-func (e *IBusandodevel) Enable() *dbus.Error {
+func (e *IBusTelex) Enable() *dbus.Error {
 	fmt.Print("Enable.")
 	e.RequireSurroundingText()
 	return nil
 }
 
-func (e *IBusandodevel) Disable() *dbus.Error {
+func (e *IBusTelex) Disable() *dbus.Error {
 	fmt.Print("Disable.")
 	return nil
 }
 
 //@method(in_signature="vuu")
-func (e *IBusandodevel) SetSurroundingText(text dbus.Variant, cursorPos uint32, anchorPos uint32) *dbus.Error {
+func (e *IBusTelex) SetSurroundingText(text dbus.Variant, cursorPos uint32, anchorPos uint32) *dbus.Error {
 	if !e.isSurroundingTextReady {
 		//fmt.Println("Surrounding Text is not ready yet.")
 		return nil
@@ -152,35 +152,35 @@ func (e *IBusandodevel) SetSurroundingText(text dbus.Variant, cursorPos uint32, 
 	return nil
 }
 
-func (e *IBusandodevel) PageUp() *dbus.Error {
+func (e *IBusTelex) PageUp() *dbus.Error {
 	if e.isInputModeLTOpened && e.inputModeLookupTable.PageUp() {
 		e.updateInputModeLT()
 	}
 	return nil
 }
 
-func (e *IBusandodevel) PageDown() *dbus.Error {
+func (e *IBusTelex) PageDown() *dbus.Error {
 	if e.isInputModeLTOpened && e.inputModeLookupTable.PageDown() {
 		e.updateInputModeLT()
 	}
 	return nil
 }
 
-func (e *IBusandodevel) CursorUp() *dbus.Error {
+func (e *IBusTelex) CursorUp() *dbus.Error {
 	if e.isInputModeLTOpened && e.inputModeLookupTable.CursorUp() {
 		e.updateInputModeLT()
 	}
 	return nil
 }
 
-func (e *IBusandodevel) CursorDown() *dbus.Error {
+func (e *IBusTelex) CursorDown() *dbus.Error {
 	if e.isInputModeLTOpened && e.inputModeLookupTable.CursorDown() {
 		e.updateInputModeLT()
 	}
 	return nil
 }
 
-func (e *IBusandodevel) CandidateClicked(index uint32, button uint32, state uint32) *dbus.Error {
+func (e *IBusTelex) CandidateClicked(index uint32, button uint32, state uint32) *dbus.Error {
 	if e.isInputModeLTOpened && e.inputModeLookupTable.SetCursorPos(index) {
 		e.commitInputModeCandidate()
 		e.closeInputModeCandidates()
@@ -188,21 +188,21 @@ func (e *IBusandodevel) CandidateClicked(index uint32, button uint32, state uint
 	return nil
 }
 
-func (e *IBusandodevel) SetCapabilities(cap uint32) *dbus.Error {
+func (e *IBusTelex) SetCapabilities(cap uint32) *dbus.Error {
 	e.capabilities = cap
 	return nil
 }
 
-func (e *IBusandodevel) SetCursorLocation(x int32, y int32, w int32, h int32) *dbus.Error {
+func (e *IBusTelex) SetCursorLocation(x int32, y int32, w int32, h int32) *dbus.Error {
 	return nil
 }
 
-func (e *IBusandodevel) SetContentType(purpose uint32, hints uint32) *dbus.Error {
+func (e *IBusTelex) SetContentType(purpose uint32, hints uint32) *dbus.Error {
 	return nil
 }
 
 //@method(in_signature="su")
-func (e *IBusandodevel) PropertyActivate(propName string, propState uint32) *dbus.Error {
+func (e *IBusTelex) PropertyActivate(propName string, propState uint32) *dbus.Error {
 	if propName == PropKeyAbout {
 		exec.Command("xdg-open", HomePage).Start()
 		return nil

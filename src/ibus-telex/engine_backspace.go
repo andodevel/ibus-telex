@@ -28,7 +28,7 @@ import (
 	"github.com/godbus/dbus"
 )
 
-func (e *IBusandodevel) bsProcessKeyEvent(keyVal uint32, keyCode uint32, state uint32) (bool, *dbus.Error) {
+func (e *IBusTelex) bsProcessKeyEvent(keyVal uint32, keyCode uint32, state uint32) (bool, *dbus.Error) {
 	var sleep = func() {
 		for len(keyPressChan) > 0 {
 			time.Sleep(5 * time.Millisecond)
@@ -83,7 +83,7 @@ func (e *IBusandodevel) bsProcessKeyEvent(keyVal uint32, keyCode uint32, state u
 	return true, nil
 }
 
-func (e *IBusandodevel) keyPressHandler(keyVal, keyCode, state uint32) {
+func (e *IBusTelex) keyPressHandler(keyVal, keyCode, state uint32) {
 	log.Printf("Backspace:ProcessKeyEvent >  %c | keyCode 0x%04x keyVal 0x%04x | %d\n", rune(keyVal), keyCode, keyVal, len(keyPressChan))
 	defer e.updateLastKeyWithShift(keyVal, state)
 	if e.keyPressDelay > 0 {
@@ -157,7 +157,7 @@ func (e *IBusandodevel) keyPressHandler(keyVal, keyCode, state uint32) {
 	e.ForwardKeyEvent(keyVal, keyCode, state)
 }
 
-func (e *IBusandodevel) getPreeditOffset(newRunes, oldRunes []rune) int {
+func (e *IBusTelex) getPreeditOffset(newRunes, oldRunes []rune) int {
 	var minLen = len(oldRunes)
 	if len(newRunes) < minLen {
 		minLen = len(newRunes)
@@ -170,7 +170,7 @@ func (e *IBusandodevel) getPreeditOffset(newRunes, oldRunes []rune) int {
 	return minLen
 }
 
-func (e *IBusandodevel) updatePreviousText(newText, oldText string) {
+func (e *IBusTelex) updatePreviousText(newText, oldText string) {
 	var oldRunes = []rune(oldText)
 	var newRunes = []rune(newText)
 	var nBackSpace = 0
@@ -193,7 +193,7 @@ func (e *IBusandodevel) updatePreviousText(newText, oldText string) {
 	e.sendBackspaceAndNewRunes(nBackSpace, newRunes[offset:])
 }
 
-func (e *IBusandodevel) sendBackspaceAndNewRunes(nBackSpace int, newRunes []rune) {
+func (e *IBusTelex) sendBackspaceAndNewRunes(nBackSpace int, newRunes []rune) {
 	if nBackSpace > 0 {
 		if e.checkInputMode(xTestFakeKeyEventIM) {
 			e.nFakeBackSpace = nBackSpace
@@ -203,7 +203,7 @@ func (e *IBusandodevel) sendBackspaceAndNewRunes(nBackSpace int, newRunes []rune
 	e.SendText(newRunes)
 }
 
-func (e *IBusandodevel) SendBackSpace(n int) {
+func (e *IBusTelex) SendBackSpace(n int) {
 	// Gtk/Qt apps have a serious sync issue with fake backspaces
 	// and normal string committing, so we'll not commit right now
 	// but delay until all the sent backspaces got processed.
@@ -256,11 +256,11 @@ func (e *IBusandodevel) SendBackSpace(n int) {
 	}
 }
 
-func (e *IBusandodevel) resetFakeBackspace() {
+func (e *IBusTelex) resetFakeBackspace() {
 	e.nFakeBackSpace = 0
 }
 
-func (e *IBusandodevel) SendText(rs []rune) {
+func (e *IBusTelex) SendText(rs []rune) {
 	if len(rs) == 0 {
 		return
 	}

@@ -35,7 +35,7 @@ func GetIBusEngineCreator() func(*dbus.Conn, string) dbus.ObjectPath {
 
 	return func(conn *dbus.Conn, ngName string) dbus.ObjectPath {
 		var engineName = strings.ToLower(ngName)
-		var engine = new(IBusandodevel)
+		var engine = new(IBusTelex)
 		var config = loadConfig(engineName)
 		var objectPath = dbus.ObjectPath(fmt.Sprintf("/org/freedesktop/IBus/Engine/%s/%d", engineName, time.Now().UnixNano()))
 		var inputMethod = telex.ParseInputMethod(config.InputMethodDefinitions, config.InputMethod)
@@ -53,7 +53,7 @@ func GetIBusEngineCreator() func(*dbus.Conn, string) dbus.ObjectPath {
 
 const KeypressDelayMs = 10
 
-func (e *IBusandodevel) init() {
+func (e *IBusTelex) init() {
 	keyPressHandler = e.keyPressHandler
 
 	if e.config.IBflags&IBmouseCapturing != 0 {
@@ -96,7 +96,7 @@ func keyPressCapturing() {
 	}
 }
 
-func (e *IBusandodevel) resetBuffer() {
+func (e *IBusTelex) resetBuffer() {
 	if e.getRawKeyLen() == 0 {
 		return
 	}
@@ -107,7 +107,7 @@ func (e *IBusandodevel) resetBuffer() {
 	}
 }
 
-func (e *IBusandodevel) toUpper(keyRune rune) rune {
+func (e *IBusTelex) toUpper(keyRune rune) rune {
 	var keyMapping = map[rune]rune{
 		'[': '{',
 		']': '}',
@@ -121,7 +121,7 @@ func (e *IBusandodevel) toUpper(keyRune rune) rune {
 	return keyRune
 }
 
-func (e *IBusandodevel) updateLastKeyWithShift(keyVal, state uint32) {
+func (e *IBusTelex) updateLastKeyWithShift(keyVal, state uint32) {
 	if e.canProcessKey(keyVal) {
 		e.lastKeyWithShift = state&IBusShiftMask != 0
 	} else {
@@ -129,7 +129,7 @@ func (e *IBusandodevel) updateLastKeyWithShift(keyVal, state uint32) {
 	}
 }
 
-func (e *IBusandodevel) isIgnoredKey(keyVal, state uint32) bool {
+func (e *IBusTelex) isIgnoredKey(keyVal, state uint32) bool {
 	if state&IBusReleaseMask != 0 {
 		//Ignore key-up event
 		return true
@@ -146,11 +146,11 @@ func (e *IBusandodevel) isIgnoredKey(keyVal, state uint32) bool {
 	return false
 }
 
-func (e *IBusandodevel) getRawKeyLen() int {
+func (e *IBusTelex) getRawKeyLen() int {
 	return len(e.preeditor.GetProcessedString(telex.EnglishMode | telex.FullText))
 }
 
-func (e *IBusandodevel) getInputMode() int {
+func (e *IBusTelex) getInputMode() int {
 	if e.wmClasses != "" {
 		if im, ok := e.config.InputModeMapping[e.wmClasses]; ok && imLookupTable[im] != "" {
 			return im
@@ -162,7 +162,7 @@ func (e *IBusandodevel) getInputMode() int {
 	return preeditIM
 }
 
-func (e *IBusandodevel) ltProcessKeyEvent(keyVal uint32, keyCode uint32, state uint32) (bool, *dbus.Error) {
+func (e *IBusTelex) ltProcessKeyEvent(keyVal uint32, keyCode uint32, state uint32) (bool, *dbus.Error) {
 	var wmClasses = x11GetFocusWindowClass()
 	//e.HideLookupTable()
 	fmt.Printf("keyCode 0x%04x keyval 0x%04x | %c\n", keyCode, keyVal, rune(keyVal))
@@ -208,7 +208,7 @@ func (e *IBusandodevel) ltProcessKeyEvent(keyVal uint32, keyCode uint32, state u
 	return false, nil
 }
 
-func (e *IBusandodevel) commitInputModeCandidate() {
+func (e *IBusTelex) commitInputModeCandidate() {
 	var im = e.inputModeLookupTable.CursorPos + 1
 	e.config.InputModeMapping[e.wmClasses] = int(im)
 
@@ -217,7 +217,7 @@ func (e *IBusandodevel) commitInputModeCandidate() {
 	e.RegisterProperties(e.propList)
 }
 
-func (e *IBusandodevel) closeInputModeCandidates() {
+func (e *IBusTelex) closeInputModeCandidates() {
 	e.inputModeLookupTable = nil
 	e.UpdateLookupTable(ibus.NewLookupTable(), true) // workaround for issue #18
 	e.HidePreeditText()
@@ -226,12 +226,12 @@ func (e *IBusandodevel) closeInputModeCandidates() {
 	e.isInputModeLTOpened = false
 }
 
-func (e *IBusandodevel) updateInputModeLT() {
+func (e *IBusTelex) updateInputModeLT() {
 	var visible = len(e.inputModeLookupTable.Candidates) > 0
 	e.UpdateLookupTable(e.inputModeLookupTable, visible)
 }
 
-func (e *IBusandodevel) isValidState(state uint32) bool {
+func (e *IBusTelex) isValidState(state uint32) bool {
 	if state&IBusControlMask != 0 ||
 		state&IBusMod1Mask != 0 ||
 		state&IBusIgnoredMask != 0 ||
@@ -243,7 +243,7 @@ func (e *IBusandodevel) isValidState(state uint32) bool {
 	return true
 }
 
-func (e *IBusandodevel) canProcessKey(keyVal uint32) bool {
+func (e *IBusTelex) canProcessKey(keyVal uint32) bool {
 	var keyRune = rune(keyVal)
 	if keyVal == IBusSpace || keyVal == IBusBackSpace || telex.IsWordBreakSymbol(keyRune) {
 		return true
@@ -251,7 +251,7 @@ func (e *IBusandodevel) canProcessKey(keyVal uint32) bool {
 	return e.preeditor.CanProcessKey(keyRune)
 }
 
-func (e *IBusandodevel) inBackspaceWhiteList() bool {
+func (e *IBusTelex) inBackspaceWhiteList() bool {
 	var inputMode = e.getInputMode()
 	for _, im := range imBackspaceList {
 		if im == inputMode {
@@ -261,11 +261,11 @@ func (e *IBusandodevel) inBackspaceWhiteList() bool {
 	return false
 }
 
-func (e *IBusandodevel) inBrowserList() bool {
+func (e *IBusTelex) inBrowserList() bool {
 	return inStringList(DefaultBrowserList, e.wmClasses)
 }
 
-func (e *IBusandodevel) checkInputMode(im int) bool {
+func (e *IBusTelex) checkInputMode(im int) bool {
 	return e.getInputMode() == im
 }
 

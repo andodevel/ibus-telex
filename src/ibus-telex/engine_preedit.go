@@ -23,12 +23,12 @@ import (
 	"log"
 	"strings"
 
-	"github.com/andodevel/telex-core"
 	"github.com/andodevel/goibus/ibus"
+	"github.com/andodevel/telex-core"
 	"github.com/godbus/dbus"
 )
 
-func (e *IBusandodevel) preeditProcessKeyEvent(keyVal uint32, keyCode uint32, state uint32) (bool, *dbus.Error) {
+func (e *IBusTelex) preeditProcessKeyEvent(keyVal uint32, keyCode uint32, state uint32) (bool, *dbus.Error) {
 	var rawKeyLen = e.getRawKeyLen()
 	var keyRune = rune(keyVal)
 	var oldText = e.getPreeditString()
@@ -83,7 +83,7 @@ func (e *IBusandodevel) preeditProcessKeyEvent(keyVal uint32, keyCode uint32, st
 	return false, nil
 }
 
-func (e *IBusandodevel) updatePreedit(processedStr string) {
+func (e *IBusTelex) updatePreedit(processedStr string) {
 	var encodedStr = e.encodeText(processedStr)
 	var preeditLen = uint32(len([]rune(encodedStr)))
 	if preeditLen == 0 {
@@ -92,7 +92,7 @@ func (e *IBusandodevel) updatePreedit(processedStr string) {
 		return
 	}
 	var ibusText = ibus.NewText(encodedStr)
-	ibusText.AppendAttr(ibus.IBUS_ATTR_TYPE_UNDERLINE, ibus.IBUS_ATTR_UNDERLINE_SINGLE, 0, preeditLen)
+	ibusText.AppendAttr(ibus.IBUS_ATTR_TYPE_NONE, ibus.IBUS_ATTR_UNDERLINE_SINGLE, 0, preeditLen)
 	e.UpdatePreeditTextWithMode(ibusText, preeditLen, true, ibus.IBUS_ENGINE_PREEDIT_COMMIT)
 
 	if e.config.IBflags&IBmouseCapturing != 0 {
@@ -100,7 +100,7 @@ func (e *IBusandodevel) updatePreedit(processedStr string) {
 	}
 }
 
-func (e *IBusandodevel) getWhiteList() [][]string {
+func (e *IBusTelex) getWhiteList() [][]string {
 	return [][]string{
 		e.config.PreeditWhiteList,
 		e.config.SurroundingTextWhiteList,
@@ -112,14 +112,14 @@ func (e *IBusandodevel) getWhiteList() [][]string {
 	}
 }
 
-func (e *IBusandodevel) getTelexInputMode() telex.Mode {
+func (e *IBusTelex) getTelexInputMode() telex.Mode {
 	if e.shouldFallbackToEnglish(false) {
 		return telex.EnglishMode
 	}
 	return telex.VietnameseMode
 }
 
-func (e *IBusandodevel) shouldFallbackToEnglish(checkVnRune bool) bool {
+func (e *IBusTelex) shouldFallbackToEnglish(checkVnRune bool) bool {
 	if e.config.IBflags&IBautoNonVnRestore == 0 {
 		return false
 	}
@@ -138,7 +138,7 @@ func (e *IBusandodevel) shouldFallbackToEnglish(checkVnRune bool) bool {
 	return !e.preeditor.IsValid(false)
 }
 
-func (e *IBusandodevel) mustFallbackToEnglish() bool {
+func (e *IBusTelex) mustFallbackToEnglish() bool {
 	if e.config.IBflags&IBautoNonVnRestore == 0 {
 		return false
 	}
@@ -150,40 +150,40 @@ func (e *IBusandodevel) mustFallbackToEnglish() bool {
 	return !e.preeditor.IsValid(true)
 }
 
-func (e *IBusandodevel) getComposedString(oldText string) string {
+func (e *IBusTelex) getComposedString(oldText string) string {
 	if telex.HasAnyVietnameseRune(oldText) && e.mustFallbackToEnglish() {
 		return e.getProcessedString(telex.EnglishMode)
 	}
 	return oldText
 }
 
-func (e *IBusandodevel) encodeText(text string) string {
+func (e *IBusTelex) encodeText(text string) string {
 	return telex.Encode(e.config.OutputCharset, text)
 }
 
-func (e *IBusandodevel) getProcessedString(mode telex.Mode) string {
+func (e *IBusTelex) getProcessedString(mode telex.Mode) string {
 	return e.preeditor.GetProcessedString(mode)
 }
 
-func (e *IBusandodevel) getPreeditString() string {
+func (e *IBusTelex) getPreeditString() string {
 	if e.shouldFallbackToEnglish(true) {
 		return e.getProcessedString(telex.EnglishMode)
 	}
 	return e.getProcessedString(telex.VietnameseMode)
 }
 
-func (e *IBusandodevel) resetPreedit() {
+func (e *IBusTelex) resetPreedit() {
 	e.HidePreeditText()
 	e.preeditor.Reset()
 }
 
-func (e *IBusandodevel) commitPreedit(s string) {
+func (e *IBusTelex) commitPreedit(s string) {
 	e.commitText(s)
 	e.HidePreeditText()
 	e.preeditor.Reset()
 }
 
-func (e *IBusandodevel) commitText(str string) {
+func (e *IBusTelex) commitText(str string) {
 	if str == "" {
 		return
 	}
@@ -191,6 +191,6 @@ func (e *IBusandodevel) commitText(str string) {
 	e.CommitText(ibus.NewText(e.encodeText(str)))
 }
 
-func (e *IBusandodevel) getVnSeq() string {
+func (e *IBusTelex) getVnSeq() string {
 	return e.preeditor.GetProcessedString(telex.VietnameseMode)
 }

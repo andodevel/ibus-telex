@@ -50,50 +50,50 @@ type IEngine interface {
 	Reset()
 }
 
-type andodevel struct {
+type TelexEngine struct {
 	composition []*Transformation
 	inputMethod InputMethod
 	flags       uint
 }
 
 func NewEngine(inputMethod InputMethod, flag uint) IEngine {
-	engine := andodevel{
+	engine := TelexEngine{
 		inputMethod: inputMethod,
 		flags:       flag,
 	}
 	return &engine
 }
 
-func (e *andodevel) GetInputMethod() InputMethod {
+func (e *TelexEngine) GetInputMethod() InputMethod {
 	return e.inputMethod
 }
 
-func (e *andodevel) SetFlag(flag uint) {
+func (e *TelexEngine) SetFlag(flag uint) {
 	e.flags = flag
 }
 
-func (e *andodevel) GetFlag(flag uint) uint {
+func (e *TelexEngine) GetFlag(flag uint) uint {
 	return e.flags
 }
 
-func (e *andodevel) isSuperKey(lowerKey rune) bool {
+func (e *TelexEngine) isSuperKey(lowerKey rune) bool {
 	return inKeyList(e.GetInputMethod().SuperKeys, lowerKey)
 }
 
-func (e *andodevel) isToneKey(key rune) bool {
+func (e *TelexEngine) isToneKey(key rune) bool {
 	return inKeyList(e.GetInputMethod().ToneKeys, key)
 }
 
-func (e *andodevel) isEffectiveKey(key rune) bool {
+func (e *TelexEngine) isEffectiveKey(key rune) bool {
 	return inKeyList(e.GetInputMethod().Keys, key)
 }
 
-func (e *andodevel) IsValid(inputIsFullComplete bool) bool {
+func (e *TelexEngine) IsValid(inputIsFullComplete bool) bool {
 	var _, last = extractLastWord(e.composition, e.GetInputMethod().Keys)
 	return isValid(last, inputIsFullComplete)
 }
 
-func (e *andodevel) GetProcessedString(mode Mode) string {
+func (e *TelexEngine) GetProcessedString(mode Mode) string {
 	var tmp []*Transformation
 	if mode&FullText != 0 {
 		tmp = e.composition
@@ -103,7 +103,7 @@ func (e *andodevel) GetProcessedString(mode Mode) string {
 	return Flatten(tmp, mode)
 }
 
-func (e *andodevel) getApplicableRules(key rune) []Rule {
+func (e *TelexEngine) getApplicableRules(key rune) []Rule {
 	var applicableRules []Rule
 	for _, inputRule := range e.inputMethod.Rules {
 		if inputRule.Key == unicode.ToLower(key) {
@@ -113,15 +113,15 @@ func (e *andodevel) getApplicableRules(key rune) []Rule {
 	return applicableRules
 }
 
-func (e *andodevel) findTargetByKey(composition []*Transformation, key rune) (*Transformation, Rule) {
+func (e *TelexEngine) findTargetByKey(composition []*Transformation, key rune) (*Transformation, Rule) {
 	return findTarget(composition, e.getApplicableRules(key), e.flags)
 }
 
-func (e *andodevel) CanProcessKey(key rune) bool {
+func (e *TelexEngine) CanProcessKey(key rune) bool {
 	return canProcessKey(key, e.inputMethod.Keys)
 }
 
-func (e *andodevel) generateTransformations(composition []*Transformation, lowerKey rune, isUpperCase bool) []*Transformation {
+func (e *TelexEngine) generateTransformations(composition []*Transformation, lowerKey rune, isUpperCase bool) []*Transformation {
 	var transformations = generateTransformations(composition, e.getApplicableRules(lowerKey), e.flags, lowerKey, isUpperCase)
 	if transformations == nil {
 		// If none of the applicable_rules can actually be applied then this new
@@ -146,7 +146,7 @@ func (e *andodevel) generateTransformations(composition []*Transformation, lower
 	return transformations
 }
 
-func (e *andodevel) applyUowShortcut(syllable []*Transformation) *Transformation {
+func (e *TelexEngine) applyUowShortcut(syllable []*Transformation) *Transformation {
 	str := Flatten(syllable, ToneLess|LowerCase)
 	if len(e.inputMethod.SuperKeys) > 0 && regUOhTail.MatchString(str) {
 		if target, missingRule := e.findTargetByKey(syllable, e.inputMethod.SuperKeys[0]); target != nil {
@@ -161,7 +161,7 @@ func (e *andodevel) applyUowShortcut(syllable []*Transformation) *Transformation
 	return nil
 }
 
-func (e *andodevel) refreshLastToneTarget(syllable []*Transformation) []*Transformation {
+func (e *TelexEngine) refreshLastToneTarget(syllable []*Transformation) []*Transformation {
 	if isValid(syllable, false) {
 		return refreshLastToneTarget(syllable, e.flags&EstdToneStyle != 0)
 	}
@@ -170,13 +170,13 @@ func (e *andodevel) refreshLastToneTarget(syllable []*Transformation) []*Transfo
 
 /***** BEGIN SIDE-EFFECT METHODS ******/
 
-func (e *andodevel) ProcessString(str string, mode Mode) {
+func (e *TelexEngine) ProcessString(str string, mode Mode) {
 	for _, key := range str {
 		e.ProcessKey(key, mode)
 	}
 }
 
-func (e *andodevel) ProcessKey(key rune, mode Mode) {
+func (e *TelexEngine) ProcessKey(key rune, mode Mode) {
 	var lowerKey = unicode.ToLower(key)
 	var isUpperCase = unicode.IsUpper(key)
 	if mode&EnglishMode != 0 || !e.CanProcessKey(lowerKey) {
@@ -197,7 +197,7 @@ func (e *andodevel) ProcessKey(key rune, mode Mode) {
 	e.composition = append(previousTransformations, lastSyllable...)
 }
 
-func (e *andodevel) RestoreLastWord() {
+func (e *TelexEngine) RestoreLastWord() {
 	var previous, lastComb = extractLastWord(e.composition, e.GetInputMethod().Keys)
 	if len(lastComb) == 0 {
 		return
@@ -205,13 +205,13 @@ func (e *andodevel) RestoreLastWord() {
 	e.composition = append(previous, breakComposition(lastComb)...)
 }
 
-func (e *andodevel) Reset() {
+func (e *TelexEngine) Reset() {
 	e.composition = nil
 }
 
 // Find the last APPENDING transformation and all
 // the transformations that add effects to it.
-func (e *andodevel) RemoveLastChar(refreshLastToneTarget bool) {
+func (e *TelexEngine) RemoveLastChar(refreshLastToneTarget bool) {
 	var lastAppending = findLastAppendingTrans(e.composition)
 	if lastAppending == nil {
 		return
