@@ -25,6 +25,7 @@ import (
 	"time"
 
 	"github.com/andodevel/ibus-telex/src/core"
+	"github.com/andodevel/ibus-telex/src/x11"
 	"github.com/godbus/dbus"
 )
 
@@ -217,7 +218,7 @@ func (e *IBusTelex) SendBackSpace(n int) {
 		}
 		fmt.Printf("Sendding %d backspace via XTestFakeKeyEvent\n", n)
 		time.Sleep(30 * time.Millisecond)
-		x11SendBackspace(n, 0)
+		x11.SendBackspace(n, 0)
 		sleep()
 		time.Sleep(time.Duration(n) * 30 * time.Millisecond)
 	} else if e.checkInputMode(surroundingTextIM) {

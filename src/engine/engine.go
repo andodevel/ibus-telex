@@ -28,6 +28,7 @@ import (
 
 	"github.com/BambooEngine/goibus/ibus"
 	"github.com/andodevel/ibus-telex/src/core"
+	"github.com/andodevel/ibus-telex/src/x11"
 	"github.com/godbus/dbus"
 )
 
@@ -81,7 +82,7 @@ func (e *IBusTelex) ProcessKeyEvent(keyVal uint32, keyCode uint32, state uint32)
 func (e *IBusTelex) FocusIn() *dbus.Error {
 	log.Print("FocusIn.")
 	var oldWmClasses = e.wmClasses
-	e.wmClasses = x11GetFocusWindowClass()
+	e.wmClasses = x11.GetFocusWindowClass()
 	fmt.Printf("WM_CLASS=(%s)\n", e.wmClasses)
 
 	e.RegisterProperties(e.propList)
@@ -222,10 +223,10 @@ func (e *IBusTelex) PropertyActivate(propName string, propState uint32) *dbus.Er
 	if propName == PropKeyMouseCapturing {
 		if propState == ibus.PROP_STATE_CHECKED {
 			e.config.IBflags |= IBmouseCapturing
-			startMouseCapturing()
+			x11.StartMouseCapturing()
 		} else {
 			e.config.IBflags &= ^IBmouseCapturing
-			stopMouseCapturing()
+			x11.StopMouseCapturing()
 		}
 	}
 

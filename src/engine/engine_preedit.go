@@ -25,6 +25,7 @@ import (
 
 	"github.com/BambooEngine/goibus/ibus"
 	"github.com/andodevel/ibus-telex/src/core"
+	"github.com/andodevel/ibus-telex/src/x11"
 	"github.com/godbus/dbus"
 )
 
@@ -96,7 +97,7 @@ func (e *IBusTelex) updatePreedit(processedStr string) {
 	e.UpdatePreeditTextWithMode(ibusText, preeditLen, true, ibus.IBUS_ENGINE_PREEDIT_COMMIT)
 
 	if e.config.IBflags&IBmouseCapturing != 0 {
-		mouseCaptureUnlock()
+		x11.MouseCaptureUnlock()
 	}
 }
 

@@ -17,7 +17,7 @@
  *
  */
 
-package main
+package x11
 
 /*
 #cgo CFLAGS: -std=gnu99
@@ -52,68 +52,68 @@ func init() {
 
 //export mouse_move_handler
 func mouse_move_handler() {
-	onMouseMove()
+	OnMouseMove()
 }
 
 //export mouse_click_handler
 func mouse_click_handler() {
-	onMouseClick()
+	OnMouseClick()
 }
 
-var onMouseMove func()
-var onMouseClick func()
+var OnMouseMove func()
+var OnMouseClick func()
 
-func startMouseRecording() {
+func StartMouseRecording() {
 	C.mouse_recording_init()
 }
 
-func stopMouseRecording() {
+func StopMouseRecording() {
 	C.mouse_recording_exit()
 }
 
-func startMouseCapturing() {
+func StartMouseCapturing() {
 	C.mouse_capture_init()
 }
 
-func stopMouseCapturing() {
+func StopMouseCapturing() {
 	C.mouse_capture_exit()
 }
 
-func mouseCaptureStartOrUnlock() {
+func MouseCaptureStartOrUnlock() {
 	C.mouse_capture_start_or_unlock()
 }
 
-func mouseCaptureUnlock() {
+func MouseCaptureUnlock() {
 	C.mouse_capture_unlock()
 }
 
-func x11Copy(str string) {
+func Copy(str string) {
 	cs := C.CString(str)
 	defer C.free(unsafe.Pointer(cs))
 	C.x11Copy(cs)
 }
 
-func x11ClipboardInit() {
+func ClipboardInit() {
 	C.clipboard_init()
 }
 
-func x11ClipboardExit() {
+func ClipboardExit() {
 	C.clipboard_exit()
 }
 
-func x11ClipboardReset() {
+func ClipboardReset() {
 	C.x11ClipboardReset()
 }
 
-func x11Paste(n int) {
+func Paste(n int) {
 	C.x11Paste(C.int(n))
 }
 
-func x11SendShiftR() {
+func SendShiftR() {
 	C.x11SendShiftR()
 }
 
-func x11SendShiftLeft(n int, shiftRightIsPressing bool, timeout int) {
+func SendShiftL(n int, shiftRightIsPressing bool, timeout int) {
 	var r = 0
 	if shiftRightIsPressing {
 		r = 1
@@ -121,11 +121,11 @@ func x11SendShiftLeft(n int, shiftRightIsPressing bool, timeout int) {
 	C.x11SendShiftLeft(C.int(n), C.int(r), C.int(timeout))
 }
 
-func x11SendBackspace(n int, timeout int) {
+func SendBackspace(n int, timeout int) {
 	C.x11SendBackspace(C.int(n), C.int(timeout))
 }
 
-func x11GetFocusWindowClass() string {
+func GetFocusWindowClass() string {
 	var wmClass = C.x11GetFocusWindowClass()
 	if wmClass != nil {
 		defer C.free(unsafe.Pointer(wmClass))

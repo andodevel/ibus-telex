@@ -26,6 +26,7 @@ import (
 	"time"
 
 	"github.com/andodevel/ibus-telex/src/core"
+	"github.com/andodevel/ibus-telex/src/x11"
 	"github.com/BambooEngine/goibus/ibus"
 	"github.com/godbus/dbus"
 )
@@ -57,10 +58,10 @@ func (e *IBusTelex) init() {
 	keyPressHandler = e.keyPressHandler
 
 	if e.config.IBflags&IBmouseCapturing != 0 {
-		startMouseCapturing()
+		x11.StartMouseCapturing()
 	}
-	startMouseRecording()
-	onMouseMove = func() {
+	x11.StartMouseRecording()
+	x11.OnMouseMove = func() {
 		e.Lock()
 		defer e.Unlock()
 		if e.checkInputMode(preeditIM) {
@@ -70,7 +71,7 @@ func (e *IBusTelex) init() {
 			e.commitPreedit(e.getPreeditString())
 		}
 	}
-	onMouseClick = func() {
+	x11.OnMouseClick = func() {
 		e.Lock()
 		defer e.Unlock()
 
@@ -79,7 +80,7 @@ func (e *IBusTelex) init() {
 		e.keyPressDelay = KeypressDelayMs
 		if e.capabilities&IBusCapSurroundingText != 0 {
 			//e.ForwardKeyEvent(IBUS_Shift_R, XK_Shift_R-8, 0)
-			x11SendShiftR()
+			x11.SendShiftR()
 			e.isSurroundingTextReady = true
 			e.keyPressDelay = KeypressDelayMs * 10
 		}
@@ -163,7 +164,7 @@ func (e *IBusTelex) getInputMode() int {
 }
 
 func (e *IBusTelex) ltProcessKeyEvent(keyVal uint32, keyCode uint32, state uint32) (bool, *dbus.Error) {
-	var wmClasses = x11GetFocusWindowClass()
+	var wmClasses = x11.GetFocusWindowClass()
 	//e.HideLookupTable()
 	fmt.Printf("keyCode 0x%04x keyval 0x%04x | %c\n", keyCode, keyVal, rune(keyVal))
 	//e.HideAuxiliaryText()
