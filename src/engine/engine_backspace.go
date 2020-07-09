@@ -74,7 +74,7 @@ func (e *IBusTelex) bsProcessKeyEvent(keyVal uint32, keyCode uint32, state uint3
 			if state&IBusLockMask != 0 {
 				keyRune = e.toUpper(keyRune)
 			}
-			e.preeditor.ProcessKey(keyRune, telex.VietnameseMode)
+			e.preeditor.ProcessKey(keyRune, core.VietnameseMode)
 		}
 		return false, nil
 	}
@@ -129,7 +129,7 @@ func (e *IBusTelex) keyPressHandler(keyVal, keyCode, state uint32) {
 		}
 		e.preeditor.ProcessKey(keyRune, e.getTelexInputMode())
 		if inKeyList(e.preeditor.GetInputMethod().AppendingKeys, keyRune) {
-			if fullSeq := e.preeditor.GetProcessedString(telex.VietnameseMode); len(fullSeq) > 0 && rune(fullSeq[len(fullSeq)-1]) == keyRune {
+			if fullSeq := e.preeditor.GetProcessedString(core.VietnameseMode); len(fullSeq) > 0 && rune(fullSeq[len(fullSeq)-1]) == keyRune {
 				e.updatePreviousText(fullSeq, oldText)
 				e.preeditor.Reset()
 			} else if newText := e.getPreeditString(); newText != "" && keyRune == rune(newText[len(newText)-1]) {
@@ -142,15 +142,15 @@ func (e *IBusTelex) keyPressHandler(keyVal, keyCode, state uint32) {
 			e.updatePreviousText(e.getPreeditString(), oldText)
 		}
 		return
-	} else if telex.IsWordBreakSymbol(keyRune) {
-		if telex.HasAnyVietnameseRune(oldText) && e.mustFallbackToEnglish() {
+	} else if core.IsWordBreakSymbol(keyRune) {
+		if core.HasAnyVietnameseRune(oldText) && e.mustFallbackToEnglish() {
 			e.preeditor.RestoreLastWord()
-			newText := e.preeditor.GetProcessedString(telex.EnglishMode) + string(keyRune)
+			newText := e.preeditor.GetProcessedString(core.EnglishMode) + string(keyRune)
 			e.updatePreviousText(newText, oldText)
-			e.preeditor.ProcessKey(keyRune, telex.EnglishMode)
+			e.preeditor.ProcessKey(keyRune, core.EnglishMode)
 			return
 		}
-		e.preeditor.ProcessKey(keyRune, telex.EnglishMode)
+		e.preeditor.ProcessKey(keyRune, core.EnglishMode)
 		e.SendText([]rune{keyRune})
 		return
 	}

@@ -35,7 +35,7 @@ import (
 type IBusTelex struct {
 	sync.Mutex
 	ibus.Engine
-	preeditor              telex.IEngine
+	preeditor              core.IEngine
 	engineName             string
 	config                 *Config
 	propList               *ibus.PropList
@@ -144,10 +144,10 @@ func (e *IBusTelex) SetSurroundingText(text dbus.Variant, cursorPos uint32, anch
 		e.preeditor.Reset()
 		for i := len(cs) - 1; i >= 0; i-- {
 			// workaround for spell checking
-			if telex.IsPunctuationMark(cs[i]) && e.preeditor.CanProcessKey(cs[i]) {
+			if core.IsPunctuationMark(cs[i]) && e.preeditor.CanProcessKey(cs[i]) {
 				cs[i] = ' '
 			}
-			e.preeditor.ProcessKey(cs[i], telex.EnglishMode|telex.InReverseOrder)
+			e.preeditor.ProcessKey(cs[i], core.EnglishMode|core.InReverseOrder)
 		}
 	}
 	return nil
@@ -215,9 +215,9 @@ func (e *IBusTelex) PropertyActivate(propName string, propState uint32) *dbus.Er
 
 	if propName == PropKeyStdToneStyle {
 		if propState == ibus.PROP_STATE_CHECKED {
-			e.config.Flags |= telex.EstdToneStyle
+			e.config.Flags |= core.EstdToneStyle
 		} else {
-			e.config.Flags &= ^telex.EstdToneStyle
+			e.config.Flags &= ^core.EstdToneStyle
 		}
 	}
 	if propName == PropKeyMouseCapturing {
@@ -242,8 +242,8 @@ func (e *IBusTelex) PropertyActivate(propName string, propState uint32) *dbus.Er
 	}
 	e.propList = GetPropListByConfig(e.config)
 
-	var inputMethod = telex.ParseInputMethod(e.config.InputMethodDefinitions, e.config.InputMethod)
-	e.preeditor = telex.NewEngine(inputMethod, e.config.Flags)
+	var inputMethod = core.ParseInputMethod(e.config.InputMethodDefinitions, e.config.InputMethod)
+	e.preeditor = core.NewEngine(inputMethod, e.config.Flags)
 	e.RegisterProperties(e.propList)
 	return nil
 }

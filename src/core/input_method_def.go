@@ -6,7 +6,7 @@
  * see <https://github.com/andodevel/ibus-telex/src/core/blob/master/LICENSE>.
  */
 
-package telex
+package core
 
 type InputMethodDefinition map[string]string
 

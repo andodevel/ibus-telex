@@ -39,10 +39,10 @@ func GetIBusEngineCreator() func(*dbus.Conn, string) dbus.ObjectPath {
 		var engine = new(IBusTelex)
 		var config = loadConfig(engineName)
 		var objectPath = dbus.ObjectPath(fmt.Sprintf("/org/freedesktop/IBus/Engine/%s/%d", engineName, time.Now().UnixNano()))
-		var inputMethod = telex.ParseInputMethod(config.InputMethodDefinitions, config.InputMethod)
+		var inputMethod = core.ParseInputMethod(config.InputMethodDefinitions, config.InputMethod)
 		engine.Engine = ibus.BaseEngine(conn, objectPath)
 		engine.engineName = engineName
-		engine.preeditor = telex.NewEngine(inputMethod, config.Flags)
+		engine.preeditor = core.NewEngine(inputMethod, config.Flags)
 		engine.config = loadConfig(engineName)
 		engine.propList = GetPropListByConfig(config)
 		ibus.PublishEngine(conn, objectPath, engine)
@@ -148,7 +148,7 @@ func (e *IBusTelex) isIgnoredKey(keyVal, state uint32) bool {
 }
 
 func (e *IBusTelex) getRawKeyLen() int {
-	return len(e.preeditor.GetProcessedString(telex.EnglishMode | telex.FullText))
+	return len(e.preeditor.GetProcessedString(core.EnglishMode | core.FullText))
 }
 
 func (e *IBusTelex) getInputMode() int {
@@ -246,7 +246,7 @@ func (e *IBusTelex) isValidState(state uint32) bool {
 
 func (e *IBusTelex) canProcessKey(keyVal uint32) bool {
 	var keyRune = rune(keyVal)
-	if keyVal == IBusSpace || keyVal == IBusBackSpace || telex.IsWordBreakSymbol(keyRune) {
+	if keyVal == IBusSpace || keyVal == IBusBackSpace || core.IsWordBreakSymbol(keyRune) {
 		return true
 	}
 	return e.preeditor.CanProcessKey(keyRune)

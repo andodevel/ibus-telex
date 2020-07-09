@@ -6,7 +6,7 @@
  * see <https://github.com/andodevel/ibus-telex/src/core/blob/master/LICENCE>.
  */
 
-package telex
+package core
 
 var firstConsonantSeqs = []string{
 	"b d đ g gh m n nh p ph r s t tr v z",

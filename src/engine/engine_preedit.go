@@ -65,7 +65,7 @@ func (e *IBusTelex) preeditProcessKeyEvent(keyVal uint32, keyCode uint32, state 
 		}
 		e.preeditor.ProcessKey(keyRune, e.getTelexInputMode())
 		if inKeyList(e.preeditor.GetInputMethod().AppendingKeys, keyRune) {
-			if fullSeq := e.preeditor.GetProcessedString(telex.VietnameseMode); len(fullSeq) > 0 && rune(fullSeq[len(fullSeq)-1]) == keyRune {
+			if fullSeq := e.preeditor.GetProcessedString(core.VietnameseMode); len(fullSeq) > 0 && rune(fullSeq[len(fullSeq)-1]) == keyRune {
 				e.commitPreedit(fullSeq)
 			} else if newText := e.getPreeditString(); newText != "" && keyRune == rune(newText[len(newText)-1]) {
 				e.commitPreedit(oldText + string(keyRune))
@@ -76,7 +76,7 @@ func (e *IBusTelex) preeditProcessKeyEvent(keyVal uint32, keyCode uint32, state 
 			e.updatePreedit(e.getPreeditString())
 		}
 		return true, nil
-	} else if telex.IsWordBreakSymbol(keyRune) {
+	} else if core.IsWordBreakSymbol(keyRune) {
 		e.commitPreedit(e.getComposedString(oldText) + string(keyRune))
 		return true, nil
 	}
@@ -113,18 +113,18 @@ func (e *IBusTelex) getWhiteList() [][]string {
 	}
 }
 
-func (e *IBusTelex) getTelexInputMode() telex.Mode {
+func (e *IBusTelex) getTelexInputMode() core.Mode {
 	if e.shouldFallbackToEnglish(false) {
-		return telex.EnglishMode
+		return core.EnglishMode
 	}
-	return telex.VietnameseMode
+	return core.VietnameseMode
 }
 
 func (e *IBusTelex) shouldFallbackToEnglish(checkVnRune bool) bool {
 	if e.config.IBflags&IBautoNonVnRestore == 0 {
 		return false
 	}
-	var vnSeq = e.getProcessedString(telex.VietnameseMode | telex.LowerCase)
+	var vnSeq = e.getProcessedString(core.VietnameseMode | core.LowerCase)
 	var vnRunes = []rune(vnSeq)
 	if len(vnRunes) == 0 {
 		return false
@@ -133,7 +133,7 @@ func (e *IBusTelex) shouldFallbackToEnglish(checkVnRune bool) bool {
 	if e.config.IBflags&IBddFreeStyle != 0 && (vnRunes[len(vnRunes)-1] == 'd' || strings.ContainsRune(vnSeq, 'đ')) {
 		return false
 	}
-	if checkVnRune && !telex.HasAnyVietnameseRune(vnSeq) {
+	if checkVnRune && !core.HasAnyVietnameseRune(vnSeq) {
 		return false
 	}
 	return !e.preeditor.IsValid(false)
@@ -143,7 +143,7 @@ func (e *IBusTelex) mustFallbackToEnglish() bool {
 	if e.config.IBflags&IBautoNonVnRestore == 0 {
 		return false
 	}
-	var vnSeq = e.getProcessedString(telex.VietnameseMode | telex.LowerCase)
+	var vnSeq = e.getProcessedString(core.VietnameseMode | core.LowerCase)
 	var vnRunes = []rune(vnSeq)
 	if len(vnRunes) == 0 {
 		return false
@@ -152,25 +152,25 @@ func (e *IBusTelex) mustFallbackToEnglish() bool {
 }
 
 func (e *IBusTelex) getComposedString(oldText string) string {
-	if telex.HasAnyVietnameseRune(oldText) && e.mustFallbackToEnglish() {
-		return e.getProcessedString(telex.EnglishMode)
+	if core.HasAnyVietnameseRune(oldText) && e.mustFallbackToEnglish() {
+		return e.getProcessedString(core.EnglishMode)
 	}
 	return oldText
 }
 
 func (e *IBusTelex) encodeText(text string) string {
-	return telex.Encode(e.config.OutputCharset, text)
+	return core.Encode(e.config.OutputCharset, text)
 }
 
-func (e *IBusTelex) getProcessedString(mode telex.Mode) string {
+func (e *IBusTelex) getProcessedString(mode core.Mode) string {
 	return e.preeditor.GetProcessedString(mode)
 }
 
 func (e *IBusTelex) getPreeditString() string {
 	if e.shouldFallbackToEnglish(true) {
-		return e.getProcessedString(telex.EnglishMode)
+		return e.getProcessedString(core.EnglishMode)
 	}
-	return e.getProcessedString(telex.VietnameseMode)
+	return e.getProcessedString(core.VietnameseMode)
 }
 
 func (e *IBusTelex) resetPreedit() {
@@ -193,5 +193,5 @@ func (e *IBusTelex) commitText(str string) {
 }
 
 func (e *IBusTelex) getVnSeq() string {
-	return e.preeditor.GetProcessedString(telex.VietnameseMode)
+	return e.preeditor.GetProcessedString(core.VietnameseMode)
 }

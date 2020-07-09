@@ -7,7 +7,7 @@
  */
 
 // Package telex implements text processing for Vietnamese
-package telex
+package core
 
 import (
 	"unicode"

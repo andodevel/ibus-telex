@@ -97,7 +97,7 @@ var imBackspaceList = []int{
 
 type Config struct {
 	InputMethod               string
-	InputMethodDefinitions    map[string]telex.InputMethodDefinition
+	InputMethodDefinitions    map[string]core.InputMethodDefinition
 	OutputCharset             string
 	Flags                     uint
 	IBflags                   uint
@@ -135,8 +135,8 @@ func loadConfig(engineName string) *Config {
 	var c = Config{
 		InputMethod:               "Telex",
 		OutputCharset:             "Unicode",
-		InputMethodDefinitions:    telex.GetInputMethodDefinitions(),
-		Flags:                     telex.EstdFlags,
+		InputMethodDefinitions:    core.GetInputMethodDefinitions(),
+		Flags:                     core.EstdFlags,
 		IBflags:                   IBstdFlags,
 		DefaultInputMode:          preeditIM,
 		InputModeMapping:          map[string]int{},
@@ -227,7 +227,7 @@ func getCharsetFromPropKey(str string) (string, bool) {
 }
 
 func isValidCharset(str string) bool {
-	var charsets = telex.GetCharsetNames()
+	var charsets = core.GetCharsetNames()
 	for _, cs := range charsets {
 		if cs == str {
 			return true
