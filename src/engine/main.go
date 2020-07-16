@@ -26,6 +26,7 @@ import (
 	"os"
 
 	"github.com/BambooEngine/goibus/ibus"
+	abus "github.com/andodevel/ibus-telex/src/ibus"
 )
 
 const (
@@ -54,6 +55,7 @@ func main() {
 		select {}
 	} else {
 		log.SetFlags(log.LstdFlags | log.Lmicroseconds)
+
 		bus := ibus.NewBus()
 		log.Println("Got Bus, Running Standalone")
 		component := &ibus.Component{
@@ -71,6 +73,8 @@ func main() {
 		ibus.NewFactory(conn, GetIBusEngineCreator())
 
 		bus.CallMethod("SetGlobalEngine", 0, EngineName+"Standalone")
+
+		abus.InitIBus()
 
 		select {}
 	}
